@@ -19,8 +19,8 @@ export class ShopProvider extends Component {
   };
 
   componentDidMount() {
-    if (localStorage.checkout_id) {
-      this.fetchCheckout(localStorage.checkout_id);
+    if (localStorage.checkout) {
+      this.fetchCheckout(localStorage.checkout);
     } else {
       this.createCheckout();
     }
@@ -28,20 +28,36 @@ export class ShopProvider extends Component {
 
   createCheckout = async () => {
     const checkout = await client.checkout.create();
-    localStorage.setItem("checkout_id", checkout.id);
+    localStorage.setItem("checkout_id", checkout);
     this.setState({ checkout: checkout });
+    console.log(checkout);
   };
 
-  fetchCheckout = (checkoutId) => {
+  fetchCheckout = async (checkoutId) => {
     client.checkout
       .fetch(checkoutId)
       .then((checkout) => {
         this.setState({ checkout: checkout });
+        console.log(checkout);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.log(error, "happening here"));
   };
 
-  addItemtoCheckout = async () => {};
+  addItemToCheckout = async (variantId, quantity) => {
+    const lineItemsToAdd = [
+      {
+        variantId,
+        quantity: parseInt(quantity, 10),
+      },
+    ];
+    const checkout = await client.checkout.addLineItems(
+      this.state.checkout.id,
+      lineItemsToAdd
+    );
+    this.setState({ checkout: checkout });
+
+    this.openCart();
+  };
 
   removeLineItem = async (lineItemIdsToRemove) => {};
 
@@ -57,16 +73,20 @@ export class ShopProvider extends Component {
     return product;
   };
 
-  closeCart = () => {};
+  closeCart = () => {
+    this.setState({ isCartOpen: false });
+  };
 
-  openCart = () => {};
+  openCart = () => {
+    this.setState({ isCartOpen: true });
+  };
 
   closeMenu = () => {};
 
   openMenu = () => {};
 
   render() {
-    console.log(this.state.checkout, "checkout data");
+    console.log(this.state.checkout, "checkout data", localStorage);
 
     return (
       <ShopContext.Provider
@@ -74,7 +94,7 @@ export class ShopProvider extends Component {
           ...this.state,
           fetchAllProducts: this.fetchAllProducts,
           fetchProductWithHandle: this.fetchProductWithHandle,
-          addItemToCheckout: this.addItemtoCheckout,
+          addItemToCheckout: this.addItemToCheckout,
           removeLineItem: this.removeLineItem,
           closeCart: this.closeCart,
           openCart: this.openCart,
