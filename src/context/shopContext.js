@@ -9,6 +9,9 @@ const client = Client.buildClient({
   storefrontAccessToken: process.env.REACT_APP_SHOPIFY_API,
 });
 
+
+console.log(client);
+
 export class ShopProvider extends Component {
   state = {
     product: {},
@@ -40,7 +43,7 @@ export class ShopProvider extends Component {
         this.setState({ checkout: checkout });
         console.log(checkout);
       })
-      .catch((error) => console.log(error, "happening here"));
+      .catch((error) => console.log(error));
   };
 
   addItemToCheckout = async (variantId, quantity) => {
@@ -59,7 +62,11 @@ export class ShopProvider extends Component {
     this.openCart();
   };
 
-  removeLineItem = async (lineItemIdsToRemove) => {};
+  removeLineItem = async (lineItemIdsToRemove) => {
+    const checkout = await client.checkout.removeLineItems(this.state.checkout.id, lineItemIdsToRemove)
+    this.setState({ checkout: checkout })
+
+  };
 
   fetchAllProducts = async () => {
     const products = await client.product.fetchAll();
@@ -73,17 +80,13 @@ export class ShopProvider extends Component {
     return product;
   };
 
-  closeCart = () => {
-    this.setState({ isCartOpen: false });
-  };
+  closeCart = () => { this.setState({ isCartOpen: false }) };
 
-  openCart = () => {
-    this.setState({ isCartOpen: true });
-  };
+  openCart = () => { this.setState({ isCartOpen: true }) };
 
-  closeMenu = () => {};
+  closeMenu = () => { this.setState({ isMenuOpen: false }) };
 
-  openMenu = () => {};
+  openMenu = () => { this.setState({ isMenuOpen: true }) };
 
   render() {
     console.log(this.state.checkout, "checkout data", localStorage);

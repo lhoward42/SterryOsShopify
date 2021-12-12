@@ -77,12 +77,13 @@ const ProductPage = () => {
           <Text>{product.description}</Text>
           <Text>{product.variants[0].id}</Text>
           <div>{populateQuantities(1, 100)}</div>
+          {quantity}
           <Button
             rounded='0'
             shadow='3'
             bg='black500'
             m={{ y: "2rem" }}
-            onClick={() => addItemToCheckout(product.variants[0].id, 1)}
+            onClick={() => addItemToCheckout(product.variants[0].id, quantity)}
           >
             Add To Cart
           </Button>
