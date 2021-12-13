@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Drawer,
   DrawerBody,
@@ -14,19 +14,76 @@ import {
   Image,
   Link,
   Box,
+  Select,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
+import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/shopContext";
 
 const Cart = () => {
-  const { isCartOpen, closeCart, checkout, removeLineItem } =
-    useContext(ShopContext);
+  let { handle } = useParams();
 
-  console.log(checkout);
+  const [quantity, setQuantity] = useState(0);
+
+  const {
+    isCartOpen,
+    closeCart,
+    checkout,
+    removeLineItem,
+    updateLineItem,
+    fetchAllProducts,
+    fetchProductWithHandle,
+    addItemToCheckout,
+    product,
+  } = useContext(ShopContext);
+
+  useEffect(() => {
+    fetchAllProducts();
+    return () => {};
+  }, [fetchAllProducts]);
+
+  useEffect(() => {
+    fetchProductWithHandle(handle);
+  }, [fetchProductWithHandle, handle]);
+
+  const onChangeQuantity = (e) => {
+    setQuantity(e.target.value);
+    updateLineItem(checkout.lineItems[0].variant.id, quantity);
+  };
+
+  const populateQuantities = (start, end) => {
+    return (
+      <>
+        <Select
+          optionFilterProp='children'
+          placeholder={checkout.lineItems.map(item => item.quantity)}
+          value={checkout.lineItems.map(item => item.quantity)}
+          onChange={onChangeQuantity}
+        >
+          {Array(end - start + 1)
+            .fill()
+            .map((_, idx) => (
+              <option key={start + idx} value={start + idx}>
+                {" "}
+                {start + idx}{" "}
+              </option>
+            ))}
+        </Select>
+      </>
+    );
+  };
+  // if (checkout.lineItems.map(item => item.id)) {console.log(checkout.lineItems.map(item => item.variant.id)) }
+  
+  console.log(product);
 
   return (
     <>
-      <Drawer isOpen={isCartOpen} placement='right' onClose={closeCart} size="sm">
+      <Drawer
+        isOpen={isCartOpen}
+        placement='right'
+        onClose={closeCart}
+        size='sm'
+      >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
@@ -50,6 +107,10 @@ const Cart = () => {
                   </Flex>
                   <Flex alignItems='center' justifyContent='center'>
                     <Text>{item.variant.price}</Text>
+                  </Flex>
+
+                  <Flex alignItems='center' justifyContent='center'>
+                    {populateQuantities(1, 100)}
                   </Flex>
                 </Grid>
               ))

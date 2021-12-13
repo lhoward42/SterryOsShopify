@@ -8,12 +8,8 @@ import {
   Button,
   Heading,
   Flex,
-  Center,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   Select,
+  Center,
 } from "@chakra-ui/react";
 
 import { ShopContext } from "../context/shopContext";
@@ -26,6 +22,7 @@ const ProductPage = () => {
     fetchAllProducts,
     addItemToCheckout,
     product,
+    products,
   } = useContext(ShopContext);
 
   const [quantity, setQuantity] = useState(0);
@@ -46,7 +43,7 @@ const ProductPage = () => {
   const populateQuantities = (start, end) => {
     return (
       <>
-        <select
+        <Select
           optionFilterProp='children'
           placeholder='Qty'
           value={quantity ? quantity : "Qty"}
@@ -60,7 +57,7 @@ const ProductPage = () => {
                 {start + idx}{" "}
               </option>
             ))}
-        </select>
+        </Select>
       </>
     );
   };
@@ -68,20 +65,35 @@ const ProductPage = () => {
   if (!product.title) return <div>Loading...</div>;
 
   return (
-    <Box>
-      <Grid templateColumns='repeat(2, 1fr)'>
-        <Image src={product.images[0].src} />
-        <Box>
-          <Heading>{product.title}</Heading>
-          <Text>{product.variants[0].price}</Text>
-          <Text>{product.description}</Text>
-          <Text>{product.variants[0].id}</Text>
-          <div>{populateQuantities(1, 100)}</div>
+    <Box p='2rem'>
+      <Grid templateColumns={["repeat(1, 1fr)", "repeat(2, 1fr)"]} m='auto'>
+        <Flex justifyContent='center' alignItems='center'>
+          <Image src={product.images[0].src} />
+        </Flex>
+        <Box
+          px='2rem'
+          display='flex'
+          flexDir='column'
+          alignItems='center'
+          justifyContent='center'
+        >
+          <Heading pb='2rem'>{product.title}</Heading>
+          <Text fontWeight='bold' pb='2rem'>
+            {product.variants[0].price}
+          </Text>
+          <Text pb='2rem' color='gray.500'>
+            {product.description}
+          </Text>
+
+          <Text>{populateQuantities(1, 100)}</Text>
           {quantity}
           <Button
+            _hover={{ opacity: "70%" }}
+            w="10rem"
             rounded='0'
             shadow='3'
-            bg='black500'
+            bg='black'
+            color="teal"
             m={{ y: "2rem" }}
             onClick={() => addItemToCheckout(product.variants[0].id, quantity)}
           >
