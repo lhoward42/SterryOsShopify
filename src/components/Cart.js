@@ -24,13 +24,14 @@ const Cart = () => {
   let { handle } = useParams();
 
   const [quantity, setQuantity] = useState(0);
+  const [variantId, setVariantId] = useState("")
 
   const {
     isCartOpen,
     closeCart,
     checkout,
     removeLineItem,
-    updateLineItem,
+    updateCheckoutQuantity,
     fetchAllProducts,
     fetchProductWithHandle,
     addItemToCheckout,
@@ -47,17 +48,26 @@ const Cart = () => {
   }, [fetchProductWithHandle, handle]);
 
   const onChangeQuantity = (e) => {
-    setQuantity(e.target.value);
-    updateLineItem(checkout.lineItems[0].variant.id, quantity);
+    setQuantity(e.target.value);  
+    setVariantId(e.target.id)
+   console.log(variantId, quantity);
+  updateCheckoutQuantity(e.target.id, e.target.value);
   };
 
   const populateQuantities = (start, end) => {
+    
     return (
       <>
+      { checkout.lineItems?.length ? 
+        checkout.lineItems.map((item) => {
+        console.log(item.variant.id, checkout);
+        const id = item.variant.id
+        return (
         <Select
           optionFilterProp='children'
-          placeholder={checkout.lineItems.map(item => item.quantity)}
-          value={checkout.lineItems.map(item => item.quantity)}
+          placeholder={item.quantity}
+          value={item.quantity}
+          id={id}
           onChange={onChangeQuantity}
         >
           {Array(end - start + 1)
@@ -66,13 +76,19 @@ const Cart = () => {
               <option key={start + idx} value={start + idx}>
                 {" "}
                 {start + idx}{" "}
+                {id}
               </option>
             ))}
         </Select>
+        ) }
+        ) : <></>
+        }
       </>
-    );
+    )
+
+    
   };
-  // if (checkout.lineItems.map(item => item.id)) {console.log(checkout.lineItems.map(item => item.variant.id)) }
+  if (checkout.lineItems) {console.log(checkout.lineItems.map(item => item.variant.id)) }
   
   console.log(product);
 
@@ -109,9 +125,7 @@ const Cart = () => {
                     <Text>{item.variant.price}</Text>
                   </Flex>
 
-                  <Flex alignItems='center' justifyContent='center'>
-                    {populateQuantities(1, 100)}
-                  </Flex>
+                  
                 </Grid>
               ))
             ) : (
@@ -128,7 +142,9 @@ const Cart = () => {
               </Box>
             )}
           </DrawerBody>
-
+<Flex alignItems='center' justifyContent='center'>
+                    {populateQuantities(1, 100)}
+                  </Flex>
           {checkout.lineItems?.length ? (
             <DrawerFooter>
               <Button>

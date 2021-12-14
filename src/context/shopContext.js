@@ -14,6 +14,7 @@ console.log(client);
 export class ShopProvider extends Component {
   state = {
     product: {},
+    quantity: 0,
     products: [],
     checkout: {},
     isCartOpen: false,
@@ -52,27 +53,38 @@ export class ShopProvider extends Component {
         quantity: parseInt(quantity, 10),
       },
     ];
+
     const checkout = await client.checkout.addLineItems(
       this.state.checkout.id,
       lineItemsToAdd
     );
     this.setState({ checkout: checkout });
-    console.log(this.state.checkout.lineItems[0].quantity);
+    console.log(checkout, lineItemsToAdd);
     this.openCart();
   };
 
-  updateLineItem = async (variantId, quantity) => {
-    
-    const lineItemToUpdate = {
+  updateCheckoutQuantity = async (variantId, quantity) => {
+    // this.setState({ quantity: this.state.checkout.lineItems[0].quantity})
+    const lineItemsToUpdate = [
+      {
       variantId,
-      quantity: parseInt(quantity, 10)
+      quantity: parseInt(quantity, 10),
+    },
+  ]
+
+    const checkoutData = {
+      checkoutId: this.state.checkout.id,
+      lineItemsToUpdate: lineItemsToUpdate
     }
-    const checkout = await client.checkout.updateLineItems(
-      this.state.checkout.id,
-      lineItemToUpdate
-    )
+    const checkout = await client.checkout.addLineItems(this.state.checkout.id, lineItemsToUpdate)
+    // const checkout = {
+    //   checkoutData.checkoutId,
+    //   checkoutData.lineItems
+    // }
+   
+    console.log(checkout);
     this.setState({ checkout: checkout })
-  }
+  };
 
   removeLineItem = async (lineItemIdsToRemove) => {
     const checkout = await client.checkout.removeLineItems(
@@ -110,13 +122,13 @@ export class ShopProvider extends Component {
   };
 
   render() {
-    console.log(this.state.checkout,);
+    console.log(this.state.checkout);
 
     return (
       <ShopContext.Provider
         value={{
           ...this.state,
-          updateLineItem: this.updateLineItem,
+          updateCheckoutQuantity: this.updateCheckoutQuantity,
           fetchAllProducts: this.fetchAllProducts,
           fetchProductWithHandle: this.fetchProductWithHandle,
           addItemToCheckout: this.addItemToCheckout,
