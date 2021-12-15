@@ -43,14 +43,11 @@ const Cart = () => {
     return () => {};
   }, [fetchAllProducts]);
 
-  useEffect(() => {
-    fetchProductWithHandle(handle);
-  }, [fetchProductWithHandle, handle]);
 
   const onChangeQuantity = (e) => {
     setQuantity(e.target.value);  
     setVariantId(e.target.id)
-   console.log(variantId, quantity);
+   console.log(quantity);
   updateCheckoutQuantity(e.target.id, e.target.value);
   };
 
@@ -64,6 +61,7 @@ const Cart = () => {
         const id = item.variant.id
         return (
         <Select
+          key={id}
           optionFilterProp='children'
           placeholder={item.quantity}
           value={item.quantity}
@@ -88,9 +86,9 @@ const Cart = () => {
 
     
   };
-  if (checkout.lineItems) {console.log(checkout.lineItems.map(item => item.variant.id)) }
+  // if (checkout.lineItems) {console.log(checkout.lineItems.map(item => item.variant.id)) }
   
-  console.log(product);
+  // console.log(product);
 
   return (
     <>
