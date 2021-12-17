@@ -9,7 +9,7 @@ const client = Client.buildClient({
   storefrontAccessToken: process.env.REACT_APP_SHOPIFY_API,
 });
 
-console.log(client);
+
 
 export class ShopProvider extends Component {
   state = {
@@ -63,27 +63,24 @@ export class ShopProvider extends Component {
     this.openCart();
   };
 
-  updateCheckoutQuantity = async (variantId, quantity) => {
-    // this.setState({ quantity: this.state.checkout.lineItems[0].quantity})
+  updateCheckoutQuantity = async (id, quantity) => {
+  try {
     const lineItemsToUpdate = [
       {
-      variantId,
+      id,
       quantity: parseInt(quantity, 10),
     },
   ]
 
-    const checkoutData = {
-      checkoutId: this.state.checkout.id,
-      lineItemsToUpdate: lineItemsToUpdate
-    }
-    const checkout = await client.checkout.addLineItems(this.state.checkout.id, lineItemsToUpdate)
-    // const checkout = {
-    //   checkoutData.checkoutId,
-    //   checkoutData.lineItems
-    // }
+  console.log(lineItemsToUpdate, this.state.checkout.id);
+
+    const checkout = await client.checkout.updateLineItems(this.state.checkout.id, lineItemsToUpdate)
    
     console.log(checkout);
     this.setState({ checkout: checkout })
+  } catch (err) {
+    console.error(err);
+  }
   };
 
   removeLineItem = async (lineItemIdsToRemove) => {

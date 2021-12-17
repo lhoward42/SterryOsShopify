@@ -19,12 +19,15 @@ import {
 import { CloseIcon } from "@chakra-ui/icons";
 import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/shopContext";
+import Client from "shopify-buy";
+
 
 const Cart = () => {
   let { handle } = useParams();
 
   const [quantity, setQuantity] = useState(0);
   const [variantId, setVariantId] = useState("")
+  
 
   const {
     isCartOpen,
@@ -38,27 +41,35 @@ const Cart = () => {
     product,
   } = useContext(ShopContext);
 
+  const client = Client.buildClient({
+    domain: process.env.REACT_APP_SHOPIFY_DOMAIN,
+    storefrontAccessToken: process.env.REACT_APP_SHOPIFY_API,
+  });
+
   useEffect(() => {
     fetchAllProducts();
     return () => {};
   }, [fetchAllProducts]);
 
 
-  const onChangeQuantity = (e) => {
-    setQuantity(e.target.value);  
-    setVariantId(e.target.id)
-   console.log(quantity);
-  updateCheckoutQuantity(e.target.id, e.target.value);
+  const onChangeQuantity = (e, item) => {
+    
+    
+  console.log(item.id, quantity);
+  updateCheckoutQuantity(item.id, e.target.value);
   };
 
+  console.log(quantity, variantId);
+  
+
   const populateQuantities = (start, end) => {
-    
+    console.log(checkout);
     return (
       <>
       { checkout.lineItems?.length ? 
         checkout.lineItems.map((item) => {
         console.log(item.variant.id, checkout);
-        const id = item.variant.id
+        const id = item.id
         return (
         <Select
           key={id}
@@ -66,7 +77,7 @@ const Cart = () => {
           placeholder={item.quantity}
           value={item.quantity}
           id={id}
-          onChange={onChangeQuantity}
+          onChange={(e) => onChangeQuantity(e, item)}
         >
           {Array(end - start + 1)
             .fill()
@@ -74,7 +85,7 @@ const Cart = () => {
               <option key={start + idx} value={start + idx}>
                 {" "}
                 {start + idx}{" "}
-                {id}
+      
               </option>
             ))}
         </Select>
